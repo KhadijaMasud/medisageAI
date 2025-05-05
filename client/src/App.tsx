@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import { UserSettingsProvider } from "@/hooks/useUserSettings";
+import TourGuide from "@/components/TourGuide";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <UserSettingsProvider>
         <Router />
+        <TourGuide />
         <Toaster />
       </UserSettingsProvider>
     </QueryClientProvider>

@@ -2,13 +2,15 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+
 import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,7 +18,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2 } from "lucide-react"
 
 const registerSchema = z.object({
   username: z.string().min(3, {
@@ -28,16 +29,18 @@ const registerSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters.",
   }),
-  confirmPassword: z.string(),
+  confirmPassword: z.string().min(6, {
+    message: "Confirm password must be at least 6 characters.",
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
+  message: "Passwords don't match",
   path: ["confirmPassword"],
-})
+});
 
 export function RegisterForm() {
-  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -53,35 +56,33 @@ export function RegisterForm() {
     setIsLoading(true)
     
     try {
-      // Remove confirmPassword as it's not needed for the API
-      const { confirmPassword, ...registrationData } = values
+      // Remove confirmPassword as it's not needed in the API call
+      const { confirmPassword, ...registerData } = values;
       
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(registrationData),
+        body: JSON.stringify(registerData),
       })
-      
+
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.message || 'Registration failed')
+        throw new Error(errorData.message || "Registration failed")
       }
-      
-      const userData = await response.json()
-      
+
       toast({
         title: "Registration successful",
-        description: `Welcome to MediSage AI, ${userData.username}!`,
+        description: "Your account has been created.",
       })
       
-      router.push('/dashboard')
+      router.push("/dashboard")
     } catch (error) {
       toast({
-        variant: "destructive",
         title: "Registration failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        description: error instanceof Error ? error.message : "Something went wrong",
+        variant: "destructive",
       })
     } finally {
       setIsLoading(false)
@@ -89,67 +90,64 @@ export function RegisterForm() {
   }
 
   return (
-    <div className="space-y-6">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter a username" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="example@email.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button className="w-full" type="submit" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create Account
-          </Button>
-        </form>
-      </Form>
-    </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter your username" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter your email" type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="Enter your password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="Confirm your password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Creating account..." : "Register"}
+        </Button>
+      </form>
+    </Form>
   )
 }

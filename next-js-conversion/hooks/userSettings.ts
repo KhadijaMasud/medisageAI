@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { createContext, ReactNode, useContext, useState, useEffect } from "react"
+import { createContext, useContext, useState, ReactNode, useEffect } from "react"
 
 interface UserSettings {
   highContrast: boolean
@@ -17,36 +17,47 @@ interface UserSettingsContextType {
 const defaultSettings: UserSettings = {
   highContrast: false,
   voiceInterface: false,
-  textSize: 'medium',
-  voiceSpeed: 1
+  textSize: "normal",
+  voiceSpeed: 1.0,
 }
 
-const UserSettingsContext = createContext<UserSettingsContextType | null>(null)
+const UserSettingsContext = createContext<UserSettingsContextType | undefined>(undefined)
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<UserSettings>(defaultSettings)
+  const [settings, setSettings] = useState<UserSettings>(() => {
+    // Check if we're in the browser environment
+    if (typeof window !== "undefined") {
+      const savedSettings = localStorage.getItem("userSettings")
+      return savedSettings ? JSON.parse(savedSettings) : defaultSettings
+    }
+    return defaultSettings
+  })
 
   useEffect(() => {
-    // Load settings from localStorage on mount
-    const savedSettings = localStorage.getItem('userSettings')
-    if (savedSettings) {
-      try {
-        setSettings(JSON.parse(savedSettings))
-      } catch (err) {
-        console.error('Error parsing user settings:', err)
-      }
+    // Apply high contrast mode
+    if (settings.highContrast) {
+      document.documentElement.classList.add("high-contrast")
+    } else {
+      document.documentElement.classList.remove("high-contrast")
     }
-  }, [])
+
+    // Apply text size
+    if (settings.textSize === "large") {
+      document.documentElement.classList.add("large-text")
+      document.documentElement.classList.remove("x-large-text")
+    } else if (settings.textSize === "x-large") {
+      document.documentElement.classList.add("x-large-text")
+      document.documentElement.classList.remove("large-text")
+    } else {
+      document.documentElement.classList.remove("large-text", "x-large-text")
+    }
+
+    // Save settings to localStorage
+    localStorage.setItem("userSettings", JSON.stringify(settings))
+  }, [settings])
 
   const updateSettings = (newSettings: Partial<UserSettings>) => {
-    setSettings(prevSettings => {
-      const updatedSettings = { ...prevSettings, ...newSettings }
-      
-      // Save to localStorage
-      localStorage.setItem('userSettings', JSON.stringify(updatedSettings))
-      
-      return updatedSettings
-    })
+    setSettings((prev) => ({ ...prev, ...newSettings }))
   }
 
   return (
@@ -58,7 +69,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
 
 export function useUserSettings() {
   const context = useContext(UserSettingsContext)
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useUserSettings must be used within a UserSettingsProvider")
   }
   return context

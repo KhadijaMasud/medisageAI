@@ -1,121 +1,117 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+"use client"
 
-export default function Home() {
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, MessageCircle, Stethoscope, Pill, Mic, UserRound } from "lucide-react"
+
+export default function HomePage() {
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="mb-20 text-center">
-        <h1 className="mb-6 text-4xl font-bold sm:text-5xl md:text-6xl">
-          Welcome to <span className="gradient-text">MediSage AI</span>
-        </h1>
-        <p className="mx-auto mb-8 max-w-2xl text-lg text-gray-600">
-          Your comprehensive AI-powered medical assistant. Get answers to medical questions,
-          check symptoms, manage your health records, and more.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <Button asChild size="lg">
-            <Link href="/dashboard">Get Started</Link>
-          </Button>
-          <Button asChild variant="outline" size="lg">
-            <Link href="/auth">Sign In</Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="mb-20">
-        <h2 className="mb-12 text-center text-3xl font-bold">Our Features</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Medical Chat</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Get instant answers to your medical questions from our AI-powered medical assistant.</p>
-            </CardContent>
-            <CardFooter>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/medical-chat">Try It</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Symptom Checker</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Analyze your symptoms and get insights about potential conditions.</p>
-            </CardContent>
-            <CardFooter>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/symptom-checker">Check Symptoms</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Medicine Scanner</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Upload an image of your medicine to get detailed information about it.</p>
-            </CardContent>
-            <CardFooter>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/medicine-scanner">Scan Medicine</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Voice Assistant</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Interact with MediSage using voice commands for a hands-free experience.</p>
-            </CardContent>
-            <CardFooter>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/voice-assistant">Start Speaking</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="mb-20">
-        <h2 className="mb-12 text-center text-3xl font-bold">How It Works</h2>
-        <div className="grid gap-10 md:grid-cols-3">
-          <div className="flex flex-col items-center text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-white">1</div>
-            <h3 className="mb-2 text-xl font-semibold">Sign Up</h3>
-            <p className="text-gray-600">Create your account to access all features and keep track of your health data.</p>
-          </div>
-
-          <div className="flex flex-col items-center text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-white">2</div>
-            <h3 className="mb-2 text-xl font-semibold">Use Tools</h3>
-            <p className="text-gray-600">Utilize our AI-powered tools to get medical information, check symptoms, or scan medicines.</p>
-          </div>
-
-          <div className="flex flex-col items-center text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-white">3</div>
-            <h3 className="mb-2 text-xl font-semibold">Track Health</h3>
-            <p className="text-gray-600">Review your history and manage your health records in your personal dashboard.</p>
+      <section className="flex-1 py-12 md:py-24 lg:py-32 bg-gradient-to-b from-blue-50 to-white dark:from-blue-950 dark:to-background">
+        <div className="container px-4 md:px-6">
+          <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+            <div className="flex flex-col justify-center space-y-4">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
+                  Your Personal Medical Assistant
+                </h1>
+                <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
+                  MediSage AI helps you understand medical information, check symptoms, and manage your health with the power of artificial intelligence.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                <Link href="/auth">
+                  <Button size="lg" className="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500">
+                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button size="lg" variant="outline">
+                    Explore Features
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="relative">
+                <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-blue-500 to-teal-400 opacity-75 blur"></div>
+                <div className="relative overflow-hidden rounded-lg border bg-background shadow-xl">
+                  <div className="grid grid-cols-2 gap-2 p-4">
+                    <FeatureCard
+                      icon={<MessageCircle className="h-10 w-10 text-blue-500" />}
+                      title="Medical Chat"
+                      description="Get answers to your health questions"
+                    />
+                    <FeatureCard
+                      icon={<Stethoscope className="h-10 w-10 text-teal-500" />}
+                      title="Symptom Checker"
+                      description="Analyze your symptoms"
+                    />
+                    <FeatureCard
+                      icon={<Pill className="h-10 w-10 text-purple-500" />}
+                      title="Medicine Scanner"
+                      description="Identify medications"
+                    />
+                    <FeatureCard
+                      icon={<Mic className="h-10 w-10 text-amber-500" />}
+                      title="Voice Assistant"
+                      description="Hands-free interaction"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Features */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50 dark:bg-gray-900">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Key Features</h2>
+              <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+                MediSage AI combines cutting-edge AI with medical knowledge to provide you with accurate and helpful information.
+              </p>
+            </div>
+          </div>
+          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-3 lg:gap-12">
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-4 shadow-sm transition-all hover:shadow-md">
+              <MessageCircle className="h-12 w-12 text-blue-500" />
+              <h3 className="text-xl font-bold">Medical Chat</h3>
+              <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+                Ask medical questions and receive instant responses based on reliable medical information.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-4 shadow-sm transition-all hover:shadow-md">
+              <Stethoscope className="h-12 w-12 text-teal-500" />
+              <h3 className="text-xl font-bold">Symptom Checker</h3>
+              <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+                Enter your symptoms to get insights about possible conditions and recommendations.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-4 shadow-sm transition-all hover:shadow-md">
+              <Mic className="h-12 w-12 text-amber-500" />
+              <h3 className="text-xl font-bold">Voice Interaction</h3>
+              <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+                Speak naturally with our voice assistant for a hands-free experience.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+  return (
+    <div className="flex flex-col items-center text-center p-4 rounded-lg border shadow-sm">
+      {icon}
+      <h3 className="mt-2 font-semibold">{title}</h3>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>
     </div>
   )
 }

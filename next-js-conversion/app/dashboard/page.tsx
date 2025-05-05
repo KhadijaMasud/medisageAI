@@ -1,154 +1,92 @@
-import { Metadata } from 'next'
-import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { MessageSquare, ActivitySquare, PillIcon, Mic } from 'lucide-react'
+"use client"
 
-export const metadata: Metadata = {
-  title: 'Dashboard - MediSage AI',
-  description: 'Your medical dashboard showing health metrics and activity',
-}
+import { useEffect } from "react"
+import Link from "next/link"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { 
+  MessageSquare, 
+  Stethoscope, 
+  Pill, 
+  Mic, 
+  UserRound
+} from "lucide-react"
 
 export default function DashboardPage() {
+  // In a real implementation, you would check if the user is authenticated
+  // and redirect to /auth if not authenticated
+  
+  const features = [
+    {
+      title: "Medical Chat",
+      description: "Get answers to your medical questions from our AI assistant.",
+      icon: <MessageSquare className="h-8 w-8 mb-2 text-primary" />,
+      href: "/medical-chat",
+      color: "bg-blue-50 dark:bg-blue-950",
+    },
+    {
+      title: "Symptom Checker",
+      description: "Analyze your symptoms and get insights about possible conditions.",
+      icon: <Stethoscope className="h-8 w-8 mb-2 text-primary" />,
+      href: "/symptom-checker",
+      color: "bg-green-50 dark:bg-green-950",
+    },
+    {
+      title: "Medicine Scanner",
+      description: "Scan medicine packaging to get information about the medication.",
+      icon: <Pill className="h-8 w-8 mb-2 text-primary" />,
+      href: "/medicine-scanner",
+      color: "bg-purple-50 dark:bg-purple-950",
+    },
+    {
+      title: "Voice Assistant",
+      description: "Interact with MediSage using voice commands and responses.",
+      icon: <Mic className="h-8 w-8 mb-2 text-primary" />,
+      href: "/voice-assistant",
+      color: "bg-amber-50 dark:bg-amber-950",
+    },
+    {
+      title: "User Profile",
+      description: "Manage your profile and medical history.",
+      icon: <UserRound className="h-8 w-8 mb-2 text-primary" />,
+      href: "/profile",
+      color: "bg-red-50 dark:bg-red-950",
+    },
+  ]
+
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="mb-6 text-3xl font-bold">Your Health Dashboard</h1>
-      
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="history">Medical History</TabsTrigger>
-          <TabsTrigger value="records">Health Records</TabsTrigger>
-          <TabsTrigger value="vitals">Vital Signs</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-medium">Medical Chats</CardTitle>
-                <MessageSquare className="h-5 w-5 text-muted-foreground" />
+    <div className="container py-10">
+      <div className="mb-10 text-center">
+        <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome to MediSage AI</h1>
+        <p className="text-muted-foreground">
+          Your personal medical assistant powered by artificial intelligence
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {features.map((feature) => (
+          <Link key={feature.title} href={feature.href} className="block">
+            <Card className={`h-full transition-all hover:shadow-md ${feature.color}`}>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  {feature.icon}
+                  <span className="ml-2">{feature.title}</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-muted-foreground">Recent medical queries</p>
+                <CardDescription className="text-foreground/80 text-sm">
+                  {feature.description}
+                </CardDescription>
               </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full">
+                  Open {feature.title}
+                </Button>
+              </CardFooter>
             </Card>
-            
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-medium">Symptom Checks</CardTitle>
-                <ActivitySquare className="h-5 w-5 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-muted-foreground">Recent symptom analyses</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-medium">Medicine Scans</CardTitle>
-                <PillIcon className="h-5 w-5 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-muted-foreground">Medications identified</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-medium">Voice Interactions</CardTitle>
-                <Mic className="h-5 w-5 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-muted-foreground">Voice assistant usage</p>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <h2 className="mt-10 mb-4 text-2xl font-semibold">Quick Actions</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Button asChild className="h-auto py-4 text-left" variant="outline">
-              <Link href="/medical-chat" className="flex flex-col items-start">
-                <span className="text-lg font-semibold">Ask a Medical Question</span>
-                <span className="text-sm text-muted-foreground">Get answers from our AI</span>
-              </Link>
-            </Button>
-            
-            <Button asChild className="h-auto py-4 text-left" variant="outline">
-              <Link href="/symptom-checker" className="flex flex-col items-start">
-                <span className="text-lg font-semibold">Check Your Symptoms</span>
-                <span className="text-sm text-muted-foreground">Analyze potential conditions</span>
-              </Link>
-            </Button>
-            
-            <Button asChild className="h-auto py-4 text-left" variant="outline">
-              <Link href="/medicine-scanner" className="flex flex-col items-start">
-                <span className="text-lg font-semibold">Scan Medicine</span>
-                <span className="text-sm text-muted-foreground">Identify medications</span>
-              </Link>
-            </Button>
-            
-            <Button asChild className="h-auto py-4 text-left" variant="outline">
-              <Link href="/voice-assistant" className="flex flex-col items-start">
-                <span className="text-lg font-semibold">Voice Assistant</span>
-                <span className="text-sm text-muted-foreground">Speak with MediSage AI</span>
-              </Link>
-            </Button>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="history" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Medical History</CardTitle>
-              <CardDescription>Your recent medical interactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border p-4 text-center">
-                <p className="text-muted-foreground">No medical history available yet</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Start using MediSage AI features to build your medical history
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="records" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Health Records</CardTitle>
-              <CardDescription>Your personal health documentation</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border p-4 text-center">
-                <p className="text-muted-foreground">No health records available</p>
-                <Button className="mt-4">Add Health Record</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="vitals" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Vital Signs</CardTitle>
-              <CardDescription>Track your health metrics over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border p-4 text-center">
-                <p className="text-muted-foreground">No vital sign records available</p>
-                <Button className="mt-4">Add Vital Signs</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }

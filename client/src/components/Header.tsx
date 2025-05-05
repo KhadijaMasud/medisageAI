@@ -1,5 +1,6 @@
 import { useState } from "react";
 import AccessibilityPanel from "./AccessibilityPanel";
+import HelpButton from "./HelpButton";
 
 export default function Header() {
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
@@ -29,10 +30,12 @@ export default function Header() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <HelpButton />
             <button
               onClick={toggleAccessibilityPanel}
               className="p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Accessibility Options"
+              data-tour-id="accessibility"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

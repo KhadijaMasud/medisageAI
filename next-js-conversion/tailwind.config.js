@@ -2,9 +2,10 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
   theme: {
     container: {
@@ -64,23 +65,12 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
-        wave: {
-          "0%, 100%": { height: "5px" },
-          "50%": { height: "15px" },
-        },
-        pulse: {
-          "0%": { boxShadow: "0 0 0 0 rgba(59, 130, 246, 0.7)" },
-          "70%": { boxShadow: "0 0 0 10px rgba(59, 130, 246, 0)" },
-          "100%": { boxShadow: "0 0 0 0 rgba(59, 130, 246, 0)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "wave": "wave 1.2s ease-in-out infinite",
-        "pulse": "pulse 1.5s infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [require("tailwindcss-animate")],
 }

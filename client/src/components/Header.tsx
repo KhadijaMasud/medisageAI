@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AccessibilityPanel from "./AccessibilityPanel";
 import HelpButton from "./HelpButton";
+import AuthButtons from "./AuthButtons";
 
 export default function Header() {
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
@@ -52,14 +53,7 @@ export default function Header() {
                 />
               </svg>
             </button>
-            <div className="hidden sm:block">
-              <button className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Log In
-              </button>
-              <button className="ml-2 bg-primary rounded-md px-4 py-2 text-sm font-medium text-white hover:bg-primary/90">
-                Sign Up
-              </button>
-            </div>
+            <AuthButtons />
           </div>
         </div>
       </header>

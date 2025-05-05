@@ -8,6 +8,16 @@ import path from "path";
 import { ParsedQs } from "qs";
 import session from "express-session";
 import { setupAuth } from "./auth";
+import { db } from "@db";
+import { 
+  userProfiles, 
+  medicalRecords, 
+  vitalSigns, 
+  medicalQueries, 
+  symptomChecks, 
+  medicineScans 
+} from "@shared/schema";
+import { eq, and, desc } from "drizzle-orm";
 
 // Extend the Express Request type to include session
 declare module "express-session" {

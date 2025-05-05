@@ -1,45 +1,63 @@
-'use client'
+"use client"
 
-import { QueryClient, QueryClientProvider as ReactQueryClientProvider } from '@tanstack/react-query'
-import { ReactNode, useState } from 'react'
+import { QueryClient, QueryClientProvider as TanstackQueryClientProvider } from "@tanstack/react-query"
+import { useState, ReactNode } from "react"
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 export function QueryClientProvider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
-
+  const [client] = useState(() => queryClient)
+  
   return (
-    <ReactQueryClientProvider client={queryClient}>
+    <TanstackQueryClientProvider client={client}>
       {children}
-    </ReactQueryClientProvider>
+    </TanstackQueryClientProvider>
   )
 }
 
-// Helper function to handle API responses
+// Helper function for API requests
 export async function apiRequest(
-  method: string, 
-  url: string, 
-  body?: any, 
-  headers?: Record<string, string>
+  method: string,
+  url: string,
+  body?: unknown,
+  customHeaders?: Record<string, string>
 ) {
-  const options: RequestInit = {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers,
-    },
-    credentials: 'include',
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...customHeaders,
   }
 
-  if (body && method !== 'GET') {
+  const options: RequestInit = {
+    method,
+    headers,
+    credentials: "include",
+  }
+
+  if (body && method !== "GET") {
     options.body = JSON.stringify(body)
   }
 
   const response = await fetch(url, options)
-  
+
+  // Handle unauthenticated errors
+  if (response.status === 401) {
+    // You might want to redirect to login page or handle this differently
+    console.error("Unauthenticated request")
+  }
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
-    const errorMessage = errorData.message || `API request failed with status: ${response.status}`
+    const errorMessage = errorData.message || `Request failed with status ${response.status}`
     throw new Error(errorMessage)
   }
-  
+
   return response
 }

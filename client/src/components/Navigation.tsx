@@ -21,7 +21,6 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              data-tour-id={tab.id}
               className={`px-4 py-2 rounded-md font-medium border-b-2 ${
                 activeTab === tab.id
                   ? "text-primary border-primary"

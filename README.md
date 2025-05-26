@@ -19,12 +19,12 @@ Medisage AI is a full-stack web application that provides an AI-powered medical 
 - voice input and output for general question Answers
 
 ---
-## Usage
- -Register a new account or log in
- -Use the symptom checker to input symptoms and receive AI-powered analysis
- -Ask medical questions via the Q&A interface
- -(Corporate tier) Upload medicine images to get detailed information
- -Use voice commands for hands-free interaction
+ ## Usage
+- Register a new account or log in
+- Use the symptom checker to input symptoms and receive AI-powered analysis
+- Ask medical questions via the Q&A interface  
+- (Corporate tier) Upload medicine images to get detailed information
+- Use voice commands for hands-free interaction
  
  ---
 ## Tech Stack

@@ -2,31 +2,33 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import { pool } from "../db";
+import pkg from 'pg';
+const { Pool } = pkg;
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgres://postgres:babar@localhost:5432/medisage',
+});
+import connectPg from "connect-pg-simple";
+
+// Initialize PostgreSQL session store
+const PostgresStore = connectPg(session);
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Create PostgreSQL session store
-const PgSession = connectPgSimple(session);
-const sessionStore = new PgSession({
-  pool: pool, 
-  tableName: 'sessions',
-  createTableIfMissing: true
-});
-
-// Set up session middleware with PostgreSQL store
+// Setup session middleware
 app.use(session({
-  store: sessionStore,
-  secret: process.env.SESSION_SECRET || 'medisage-development-secret',
+  store: new PostgresStore({
+    pool: pool,
+    tableName: 'sessions',
+    createTableIfMissing: true
+  }),
+  secret: process.env.SESSION_SECRET || 'medisage-secret-key',
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    secure: false, // Set to true in production with HTTPS
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  cookie: { 
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    secure: false // Set to true in production with HTTPS
   }
 }));
 

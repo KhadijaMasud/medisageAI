@@ -2,11 +2,14 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import * as storage from "./storage";
 import multer from "multer";
-import * as OpenAI from "./openai";
+import * as AI from "./together";
 import fs from "fs";
 import path from "path";
 import { ParsedQs } from "qs";
 import session from "express-session";
+import { db } from "../db";
+import { users } from "../shared/schema";
+import { eq } from "drizzle-orm";
 
 // Extend the Express Request type to include session
 declare module "express-session" {
@@ -43,7 +46,7 @@ const upload = multer({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Medical Query API - Handles general medical questions
-  app.post("/api/medical-query", async (req: Request, res: Response) => {
+  app.post("/api/medical-query", async (req: RequestWithSession, res: Response) => {
     try {
       const { question } = req.body;
       
@@ -51,14 +54,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Question is required" });
       }
       
-      // Log query for future reference
-      await storage.logMedicalQuery(question);
+      // Save the query with user ID if authenticated
+      const userId = req.session.userId;
       
-      // Get response from OpenAI
-      const answer = await OpenAI.getMedicalQueryResponse(question);
+      try {
+        // Log the query before processing
+        await storage.logMedicalQuery(question, userId?.toString());
+      } catch (dbError) {
+        console.error("Error logging medical query:", dbError);
+        // Continue processing even if logging fails
+      }
       
-      // Save the response
-      await storage.saveQueryResult(question, answer);
+      // Get response from AI service
+      const answer = await AI.getMedicalQueryResponse(question);
+      
+      try {
+        // Save the query result
+        await storage.saveQueryResult(question, answer, userId?.toString());
+      } catch (dbError) {
+        console.error("Error saving query result:", dbError);
+        // Continue processing even if saving fails
+      }
       
       return res.json({ answer });
     } catch (error) {
@@ -76,11 +92,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Symptoms description is required" });
       }
       
-      // Get analysis from OpenAI
-      const analysisResult = await OpenAI.analyzeSymptoms(symptoms, age, gender, conditions);
+      // Get analysis from AI service
+      const analysisResult = await AI.analyzeSymptoms(symptoms, age, gender, conditions);
       
-      // Save result
-      await storage.saveSymptomCheck(symptoms, age, analysisResult);
+      // Skip database operations for now
+      // await storage.saveSymptomCheck(symptoms, age, analysisResult);
       
       return res.json(analysisResult);
     } catch (error) {
@@ -100,15 +116,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const imageBuffer = req.file.buffer;
       const base64Image = imageBuffer.toString("base64");
       
-      // Get medicine info using OpenAI Vision
-      const medicineInfo = await OpenAI.analyzeMedicineImage(base64Image, req.file.mimetype);
+      // Get medicine info using AI Vision
+      const medicineInfo = await AI.analyzeMedicineImage(base64Image, req.file.mimetype);
       
-      // Save the image analysis result
-      await storage.saveMedicineAnalysis(
-        base64Image, 
-        req.file.mimetype, 
-        medicineInfo
-      );
+      // Skip database operations for now
+      // await storage.saveMedicineAnalysis(
+      //   base64Image, 
+      //   req.file.mimetype, 
+      //   medicineInfo
+      // );
       
       return res.json(medicineInfo);
     } catch (error) {
@@ -127,10 +143,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Process the voice command
-      const answer = await OpenAI.processVoiceCommand(input);
+      const answer = await AI.processVoiceCommand(input);
       
-      // Save the voice interaction
-      await storage.saveVoiceInteraction(input, answer);
+      // Skip database operations for now
+      // await storage.saveVoiceInteraction(input, answer);
       
       return res.json({ answer });
     } catch (error) {
@@ -156,6 +172,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create a session
       req.session.userId = user.id;
+      console.log("Created session for user:", user.id);
+      console.log("Session after login:", req.session);
       
       return res.json({ 
         id: user.id,
@@ -171,10 +189,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User Registration API
   app.post("/api/auth/register", async (req: RequestWithSession, res: Response) => {
     try {
-      const { username, password, email } = req.body;
+      const { username, password, email, name } = req.body;
       
       if (!username || !password || !email) {
         return res.status(400).json({ message: "Username, password, and email are required" });
+      }
+
+      // Basic validation
+      if (username.length < 3) {
+        return res.status(400).json({ message: "Username must be at least 3 characters" });
+      }
+      
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
+      
+      if (!email.includes('@')) {
+        return res.status(400).json({ message: "Please provide a valid email address" });
       }
       
       // Check if user already exists
@@ -184,17 +215,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ message: "Username already exists" });
       }
       
-      // Create new user
-      const newUser = await storage.createUser(username, password, email);
-      
-      // Create a session
-      req.session.userId = newUser.id;
-      
-      return res.status(201).json({ 
-        id: newUser.id,
-        username: newUser.username,
-        role: newUser.role
-      });
+      try {
+        // Create new user
+        const newUser = await storage.createUser(username, password, email, name);
+        
+        // Create a session
+        req.session.userId = newUser.id;
+        
+        return res.status(201).json({ 
+          id: newUser.id,
+          username: newUser.username,
+          role: newUser.role,
+          name: newUser.name
+        });
+      } catch (createError) {
+        console.error("Error creating user:", createError);
+        return res.status(500).json({ message: "Failed to create user account" });
+      }
     } catch (error) {
       console.error("Error during registration:", error);
       return res.status(500).json({ message: "Registration failed" });
@@ -219,6 +256,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return res.json({ status: "ok" });
   });
 
+  // Get authenticated user status
+  app.get("/api/auth/status", async (req: RequestWithSession, res: Response) => {
+    try {
+      console.log("Session info:", req.session);
+      console.log("Session userId:", req.session.userId);
+      
+      if (!req.session || !req.session.userId) {
+        console.log("No session or userId found");
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      console.log("Looking for user with ID:", req.session.userId);
+      
+      // Retrieve user from database
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, req.session.userId)
+      });
+      
+      console.log("User found:", user ? "Yes" : "No");
+      
+      if (!user) {
+        // Session exists but user doesn't - clear session
+        console.log("Session exists but user not found - clearing session");
+        req.session.destroy((err) => {
+          if (err) console.error("Error destroying invalid session:", err);
+        });
+        return res.status(401).json({ message: "User not found" });
+      }
+      
+      // Return user data without sensitive information
+      return res.json({
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        role: user.role
+      });
+    } catch (error) {
+      console.error("Error getting user status:", error);
+      return res.status(500).json({ message: "Failed to retrieve user status" });
+    }
+  });
+  
   const httpServer = createServer(app);
   return httpServer;
 }

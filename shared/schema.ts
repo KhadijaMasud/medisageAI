@@ -1,7 +1,20 @@
-import { pgTable, text, serial, timestamp, json, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, json, varchar, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
+
+// Sessions table for express-session with connect-pg-simple
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: json("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => ({
+    expireIdx: index("IDX_session_expire").on(table.expire),
+  })
+);
 
 // Users table
 export const users = pgTable("users", {
@@ -10,13 +23,15 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   email: text("email").notNull(),
   role: text("role").default("user").notNull(),
-  auth_token: text("auth_token")
+  auth_token: text("auth_token"),
+  name: text("name"),
+  created_at: timestamp("created_at").defaultNow().notNull()
 });
 
 // Medical Queries table
 export const medicalQueries = pgTable("medical_queries", {
   id: serial("id").primaryKey(),
-  user_id: serial("user_id").references(() => users.id),
+  user_id: serial("user_id"),
   question: text("question").notNull(),
   context: text("context"),
   answer: text("answer"),
@@ -26,7 +41,7 @@ export const medicalQueries = pgTable("medical_queries", {
 // Symptom Checks table
 export const symptomChecks = pgTable("symptom_checks", {
   id: serial("id").primaryKey(),
-  user_id: serial("user_id").references(() => users.id),
+  user_id: serial("user_id"),
   usersymptom: text("usersymptom").notNull(),
   agegroup: text("agegroup"),
   result: json("result"),
@@ -36,7 +51,7 @@ export const symptomChecks = pgTable("symptom_checks", {
 // Medicine Scans table
 export const medicineScans = pgTable("medicine_scans", {
   id: serial("id").primaryKey(),
-  user_id: serial("user_id").references(() => users.id),
+  user_id: serial("user_id"),
   image_data: text("image_data").notNull(),
   image_type: text("image_type").notNull(),
   analysis_result: json("analysis_result"),
@@ -46,7 +61,7 @@ export const medicineScans = pgTable("medicine_scans", {
 // Voice Interactions table
 export const voiceInteractions = pgTable("voice_interactions", {
   id: serial("id").primaryKey(),
-  user_id: serial("user_id").references(() => users.id),
+  user_id: serial("user_id"),
   user_input: text("user_input").notNull(),
   system_response: text("system_response").notNull(),
   timestamp: timestamp("timestamp").defaultNow().notNull()

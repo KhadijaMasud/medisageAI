@@ -128,7 +128,7 @@ export default function MedicalChat() {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800">Medical Chatbot</h2>
+        <h2 className="text-lg  font-semibold text-gray-800">Medical Chatbot</h2>
         <p className="text-sm text-gray-600">Ask any general medical questions you may have.</p>
       </div>
       

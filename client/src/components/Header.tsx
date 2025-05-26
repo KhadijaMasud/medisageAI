@@ -1,18 +1,59 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import AccessibilityPanel from "./AccessibilityPanel";
+import HelpButton from "./HelpButton";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Header() {
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const [, setLocation] = useLocation();
 
   const toggleAccessibilityPanel = () => {
     setIsAccessibilityOpen(!isAccessibilityOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setLocation("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const navigateToAuth = () => {
+    setLocation("/auth");
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user || !user.username) return "U";
+    return user.username.charAt(0).toUpperCase();
   };
 
   return (
     <>
       <header className="bg-white shadow-sm border-b border-gray-200 w-full py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center">
+          <div 
+            className="flex items-center cursor-pointer" 
+            onClick={() => {
+              setLocation("/");
+              // If we're already on the home page, we need to reset the tab
+              const homeEvent = new CustomEvent('reset-to-home');
+              window.dispatchEvent(homeEvent);
+            }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8 text-primary"
@@ -29,6 +70,7 @@ export default function Header() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <HelpButton />
             <button
               onClick={toggleAccessibilityPanel}
               className="p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
@@ -49,14 +91,68 @@ export default function Header() {
                 />
               </svg>
             </button>
-            <div className="hidden sm:block">
-              <button className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Log In
-              </button>
-              <button className="ml-2 bg-primary rounded-md px-4 py-2 text-sm font-medium text-white hover:bg-primary/90">
-                Sign Up
-              </button>
-            </div>
+            
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10 border-2 border-gray-200">
+                      <AvatarFallback className="bg-primary text-white">
+                        {getUserInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-4 py-2 text-sm">
+                    <p className="font-semibold">Signed in as</p>
+                    <p className="text-gray-500 truncate">{user?.username}</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="cursor-pointer"
+                    onClick={() => setLocation("/profile")}
+                  >
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="cursor-pointer"
+                    onClick={() => setLocation("/settings")}
+                  >
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="hidden sm:flex items-center space-x-2">
+                <Button 
+                  variant="outline" 
+                  onClick={navigateToAuth}
+                  className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Log In
+                </Button>
+                <Button 
+                  onClick={() => {
+                    navigateToAuth();
+                    // Add a small delay to allow for navigation before attempting to change tabs
+                    setTimeout(() => {
+                      const registerTabTrigger = document.querySelector('[value="register"]');
+                      if (registerTabTrigger instanceof HTMLElement) {
+                        registerTabTrigger.click();
+                      }
+                    }, 100);
+                  }}
+                  className="bg-primary rounded-md px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
+                >
+                  Sign Up
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </header>

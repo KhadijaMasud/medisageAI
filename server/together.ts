@@ -1,8 +1,10 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import fetch from "node-fetch";
 
-// Environment variables
 const TOGETHER_API_KEY = process.env.TOGETHER_API_KEY || "";
-const GEMINI_API_KEY = "AIzaSyCqwPfr9nHLPqybNaPdjw2mWqhS98NmMBA"; // Replace with env variable in production
+console.log("TOGETHER_API_KEY:", process.env.TOGETHER_API_KEY);
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";  // Use environment variable here
 const BASE_URL = "https://api.together.xyz/v1";
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta";
 
@@ -83,7 +85,7 @@ export async function getMedicalQueryResponse(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${config.apiKey}`,
+          Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
         },
         body: JSON.stringify({
           model: config.model,

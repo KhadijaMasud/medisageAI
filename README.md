@@ -12,6 +12,10 @@ Medisage AI is a full-stack web application that provides an AI-powered medical 
 - Secure user authentication with password hashing  
 - Responsive React frontend with smooth backend integration (Node.js, Express, PostgreSQL)  
 - Voice command processing for hands-free interaction (corporate tier)
+- Tier switcing for extended features using design patterns
+- ## Extended Features
+- Medical Image Scanner to define te uses of a medicine
+- voice input and output for general question Answers
 
 ---
 
@@ -29,5 +33,5 @@ Medisage AI is a full-stack web application that provides an AI-powered medical 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/medisage-ai.git
+   git clone https://github.com/KhadijaMasud/medisage-ai.git
    cd medisage-ai

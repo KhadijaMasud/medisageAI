@@ -13,12 +13,20 @@ Medisage AI is a full-stack web application that provides an AI-powered medical 
 - Responsive React frontend with smooth backend integration (Node.js, Express, PostgreSQL)  
 - Voice command processing for hands-free interaction (corporate tier)
 - Tier switcing for extended features using design patterns
-- ## Extended Features
+---
+ ## Extended Features
 - Medical Image Scanner to define te uses of a medicine
 - voice input and output for general question Answers
 
 ---
-
+## Usage
+ -Register a new account or log in
+ -Use the symptom checker to input symptoms and receive AI-powered analysis
+ -Ask medical questions via the Q&A interface
+ -(Corporate tier) Upload medicine images to get detailed information
+ -Use voice commands for hands-free interaction
+ 
+ ---
 ## Tech Stack
 
 - **Frontend:** React  
